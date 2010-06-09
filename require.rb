@@ -15,17 +15,17 @@ Require do
       gem :require
     end
     email 'mail@wintoni.us'
-    name 'gem_template'
+    name 'periodic_counter'
     homepage "http://github.com/winton/#{name}"
     summary ""
     version '0.1.0'
   end
   
-  bin { require 'lib/gem_template' }
+  bin { require 'lib/periodic_counter' }
   
   lib do
     gem :active_wrapper
-    require 'lib/gem_template/gem_template'
+    require 'yaml'
   end
   
   rakefile do
@@ -36,7 +36,7 @@ Require do
   
   spec_helper do
     require 'require/spec_helper'
-    require 'lib/gem_template'
+    require 'lib/periodic_counter'
     require 'pp'
   end
 end

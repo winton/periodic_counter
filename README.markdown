@@ -1,36 +1,43 @@
-GemTemplate
-===========
+PeriodicCounter
+===============
 
-A gem template for new projects.
+Maintains period fields on any counter column in your database
 
 Requirements
 ------------
 
 <pre>
-sudo gem install stencil
+sudo gem install periodic_template
 </pre>
 
-Setup the template
-------------------
+Create columns
+--------------
 
-You only have to do this once.
+For every counter column (X), you should also have a <code>X\_computed\_at</code> datetime column.
+
+To define period columns, use this format: <code>X\_last\_1\_week</code> or <code>X\_last\_6\_hours</code>.
+
+The name the period column should follow the format of ActiveSupport's time extensions:
+
+http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html
+
+Create configuration
+--------------------
+
+Create a file, <code>config/counters.yml</code>:
 
 <pre>
-git clone git@github.com:winton/gem_template.git
-cd gem_template
-stencil
+my_table_name:
+  - my_counter
 </pre>
 
-Setup a new project
--------------------
+The plugin assumes that the <code>config</code> directory also houses your <code>database.yml</code> file.
 
-Do this for every new project.
+Create cron entry
+-----------------
+
+Add the following command to your crontab at a period of your choosing:
 
 <pre>
-mkdir my_project
-git init
-stencil gem_template
-rake rename
+cd /path/to/your/app && RAILS_ENV=production periodic_counter
 </pre>
-
-The last command does a find-replace (gem\_template -> my\_project) on files and filenames.
