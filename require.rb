@@ -29,14 +29,21 @@ Require do
   end
   
   rakefile do
+    gem(:active_wrapper)
     gem(:rake) { require 'rake/gempackagetask' }
     gem(:rspec) { require 'spec/rake/spectask' }
     require 'require/tasks'
   end
   
   spec_helper do
+    gem(:active_wrapper)
     require 'require/spec_helper'
     require 'lib/periodic_counter'
     require 'pp'
+  end
+  
+  spec_rakefile do
+    gem(:rake)
+    gem(:active_wrapper) { require 'active_wrapper/tasks' }
   end
 end
