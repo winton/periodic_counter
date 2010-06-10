@@ -19,7 +19,7 @@ Define period columns using this format: <code>X\_last\_week</code> or <code>X\_
 
 The period name should follow the format of [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html).
 
-Also add a <code>counter_data</code> varchar column with a length of 2048.
+Also add an <code>X_data</code> varchar column with a length of 2048.
 
 Create configuration
 --------------------
