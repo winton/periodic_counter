@@ -17,7 +17,7 @@ Require do
     email 'mail@wintoni.us'
     name 'periodic_counter'
     homepage "http://github.com/winton/#{name}"
-    summary ""
+    summary "Maintains period fields on any counter column in your database"
     version '0.1.0'
   end
   
