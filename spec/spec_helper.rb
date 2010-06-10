@@ -11,14 +11,7 @@ $db, $log, $mail = ActiveWrapper.setup(
 $db.establish_connection
 
 def create_counter
-  Counter.create(
-    :counter => 3,
-    :counter_computed_at => Time.now,
-    :counter_last_day => 1,
-    :counter_last_2_days => 1,
-    :counter_last_week => 1,
-    :counter_last_2_weeks => 1
-  )
+  Counter.create(:counter => 1)
 end
 
 def start
@@ -30,4 +23,5 @@ def stub_time(time)
 end
 
 class Counter < ActiveRecord::Base
+  serialize :counter_data
 end

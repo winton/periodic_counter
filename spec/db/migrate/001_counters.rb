@@ -1,12 +1,10 @@
-class CountersWithoutStartingValue < ActiveRecord::Migration
+class Counters < ActiveRecord::Migration
   def self.up
     create_table :counters do |t|
       t.integer :counter
-      t.datetime :counter_computed_at
       t.integer :counter_last_day
       t.integer :counter_last_2_days
-      t.integer :counter_last_week
-      t.integer :counter_last_2_weeks
+      t.string :counter_data, :limit => 2048
     end
   end
 

@@ -26,40 +26,40 @@ class PeriodicCounter
       if columns
         columns.each do |column|
           if counters.include?(column)
+            # Find period columns
             period = columns.select do |col|
               col =~ /^#{column}/ &&
               col != column &&
-              !col.include?('computed_at') &&
-              !col.include?('starting_value')
+              !col.include?('_data')
             end
-            select_columns = [ 'id', column, "#{column}_computed_at", "#{column}_starting_value" ] + period
-            select_columns &= columns
+            # Grab all records
+            select_columns = [ 'id', column, "#{column}_data" ]
+            select_columns += period
             records = ActiveRecord::Base.connection.select_all <<-SQL
               SELECT #{select_columns.join(', ')}
               FROM #{table}
             SQL
             records.each do |record|
               id = record.delete('id')
-              computed_at = ActiveRecord::ConnectionAdapters::Column.string_to_time(
-                record.delete("#{column}_computed_at")
-              )
+              data = YAML::load(record["#{column}_data"] || '') || {}
+              computed_at = data['computed_at'] || Time.now.utc
               count = record.delete(column).to_i
-              time_since_compute = Time.now.utc - computed_at.utc
-              if record.keys.include?("#{column}_starting_value")
-                unless record["#{column}_starting_value"]
-                  record["#{column}_starting_value"] = count
-                end
-                starting_value = record["#{column}_starting_value"].to_i
-              end
-              starting_value ||= 0
+              time_since_compute = Time.now.utc - computed_at
+              # Set period counters
               period.each do |col|
-                period_count = record[col].to_i
                 duration = column_to_period_integer(col)
+                starting_value = data[col].to_i
                 if (time_since_compute - duration) >= 0
-                  record[col] = count - period_count - starting_value
+                  record[col] = count - starting_value
+                  data[col] = count
+                else
+                  data[col] ||= count
                 end
               end
-              set = record.collect { |col, value| "#{col} = #{value}" }
+              # Update record
+              data['computed_at'] = Time.now.utc
+              record["#{column}_data"] = "'#{YAML::dump(data)}'"
+              set = record.collect { |col, value| "#{col} = #{value || 0}" }
               ActiveRecord::Base.connection.update <<-SQL
                 UPDATE #{table}
                 SET #{set.join(', ')}
