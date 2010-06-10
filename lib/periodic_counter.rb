@@ -42,22 +42,23 @@ class PeriodicCounter
             records.each do |record|
               id = record.delete('id')
               data = YAML::load(record["#{column}_data"] || '') || {}
-              computed_at = data['computed_at'] || Time.now.utc
               count = record.delete(column).to_i
-              time_since_compute = Time.now.utc - computed_at
               # Set period counters
               period.each do |col|
+                computed_at = data["#{col}_at"] || Time.now.utc
                 duration = column_to_period_integer(col)
+                time_since_compute = Time.now.utc - computed_at
                 starting_value = data[col].to_i
                 if (time_since_compute - duration) >= 0
                   record[col] = count - starting_value
                   data[col] = count
+                  data["#{col}_at"] = Time.now.utc
                 else
                   data[col] ||= count
+                  data["#{col}_at"] ||= Time.now.utc
                 end
               end
               # Update record
-              data['computed_at'] = Time.now.utc
               record["#{column}_data"] = "'#{YAML::dump(data)}'"
               set = record.collect { |col, value| "#{col} = #{value || 0}" }
               ActiveRecord::Base.connection.update <<-SQL
