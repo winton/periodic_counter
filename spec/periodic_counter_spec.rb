@@ -49,7 +49,7 @@ describe PeriodicCounter do
   
   it "should add to counter_last_2_days" do
     Counter.last.update_attribute :counter, 3
-    stub_time(Time.now + 3.days)
+    stub_time(Time.now + 2.days)
     start
     attributes = Counter.last.attributes
     data = attributes.delete('counter_data')
