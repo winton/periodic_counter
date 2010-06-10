@@ -48,15 +48,14 @@ class PeriodicCounter
                 computed_at = data["#{col}_at"] || Time.now.utc
                 duration = column_to_period_integer(col)
                 time_since_compute = Time.now.utc - computed_at
-                starting_value = data[col].to_i
                 if (time_since_compute - duration) >= 0
-                  record[col] = count - starting_value
                   data[col] = count
                   data["#{col}_at"] = Time.now.utc
                 else
                   data[col] ||= count
                   data["#{col}_at"] ||= Time.now.utc
                 end
+                record[col] = count - data[col].to_i
               end
               # Update record
               record["#{column}_data"] = "'#{YAML::dump(data)}'"

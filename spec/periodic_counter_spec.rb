@@ -27,8 +27,27 @@ describe PeriodicCounter do
     }
   end
   
-  it "should add to counter_last_day" do
+  it "should add to both counters on increment" do
     Counter.last.update_attribute :counter, 2
+    start
+    attributes = Counter.last.attributes
+    data = attributes.delete('counter_data')
+    data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
+    data.delete('counter_last_2_days_at').to_s.should == Time.now.utc.to_s
+    data.should == {
+      "counter_last_day"=>1,
+      "counter_last_2_days"=>1
+    }
+    attributes.should == {
+      "id"=>1,
+      "counter"=>2,
+      "counter_last_day"=>1,
+      "counter_last_2_days"=>1
+    }
+  end
+  
+  it "should reset counter_last_day" do
+    Counter.last.update_attribute :counter, 3
     stub_time(Time.now + 1.day)
     start
     attributes = Counter.last.attributes
@@ -36,19 +55,19 @@ describe PeriodicCounter do
     data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
     data.delete('counter_last_2_days_at').to_s.should == (Time.now - 1.day).utc.to_s
     data.should == {
-      "counter_last_day"=>2,
+      "counter_last_day"=>3,
       "counter_last_2_days"=>1
     }
     attributes.should == {
       "id"=>1,
-      "counter"=>2,
-      "counter_last_day"=>1,
-      "counter_last_2_days"=>0
+      "counter"=>3,
+      "counter_last_day"=>0,
+      "counter_last_2_days"=>2
     }
   end
   
-  it "should add to counter_last_2_days" do
-    Counter.last.update_attribute :counter, 3
+  it "should reset counter_last_2_days" do
+    Counter.last.update_attribute :counter, 4
     stub_time(Time.now + 2.days)
     start
     attributes = Counter.last.attributes
@@ -56,14 +75,14 @@ describe PeriodicCounter do
     data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
     data.delete('counter_last_2_days_at').to_s.should == Time.now.utc.to_s
     data.should == {
-      "counter_last_day"=>3,
-      "counter_last_2_days"=>3
+      "counter_last_day"=>4,
+      "counter_last_2_days"=>4
     }
     attributes.should == {
       "id"=>1,
-      "counter"=>3,
-      "counter_last_day"=>1,
-      "counter_last_2_days"=>2
+      "counter"=>4,
+      "counter_last_day"=>0,
+      "counter_last_2_days"=>0
     }
   end
 end
