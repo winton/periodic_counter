@@ -13,9 +13,11 @@ sudo gem install periodic_template
 Create columns
 --------------
 
-Define period columns using this format: <code>X\_last\_1\_week</code> or <code>X\_last\_6\_hours</code>.
+You should already have a counter column defined that is being incremented by something (let's call the column X).
 
-The name should follow the format of [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html).
+Define period columns using this format: <code>X\_last\_week</code> or <code>X\_last\_6\_hours</code>.
+
+The period name should follow the format of [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html).
 
 Also add a <code>counter_data</code> varchar column with a length of 2048.
 
