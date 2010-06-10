@@ -15,11 +15,7 @@ Create columns
 
 For every counter column (X), you should also have a <code>X\_computed\_at</code> datetime column.
 
-To define period columns, use this format: <code>X\_last\_1\_week</code> or <code>X\_last\_6\_hours</code>.
-
-The name the period column should follow the format of ActiveSupport's time extensions:
-
-http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html
+To define period columns, use this format: <code>X\_last\_1\_week</code> or <code>X\_last\_6\_hours</code>. The name should follow the format of [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html).
 
 If you are adding this to a counter that already has a count, you will also need a <code>X\_starting\_value</code> integer column.
 
