@@ -21,6 +21,8 @@ The name the period column should follow the format of ActiveSupport's time exte
 
 http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html
 
+If you are adding this to a counter that already has a count, you will also need a <code>X\_starting\_value</code> integer column.
+
 Create configuration
 --------------------
 
