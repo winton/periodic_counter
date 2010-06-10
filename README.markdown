@@ -7,7 +7,7 @@ Requirements
 ------------
 
 <pre>
-sudo gem install periodic_template
+sudo gem install periodic_counter
 </pre>
 
 Create columns
