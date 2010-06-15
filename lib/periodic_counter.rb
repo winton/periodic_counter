@@ -48,12 +48,20 @@ class PeriodicCounter
                 computed_at = data["#{col}_at"] || Time.now.utc
                 duration = column_to_period_integer(col)
                 time_since_compute = Time.now.utc - computed_at
+                last_day =
+                  if col.include?('day')
+                    self.class.today
+                  elsif col.include?('week')
+                    self.class.last_monday
+                  elsif col.include?('month')
+                    self.class.first_of_the_month
+                  end
                 if (time_since_compute - duration) >= 0
                   data[col] = count
-                  data["#{col}_at"] = Time.now.utc
+                  data["#{col}_at"] = last_day
                 else
                   data[col] ||= count
-                  data["#{col}_at"] ||= Time.now.utc
+                  data["#{col}_at"] ||= last_day
                 end
                 record[col] = count - data[col].to_i
               end
@@ -79,5 +87,26 @@ class PeriodicCounter
       column[0] = 1
     end
     eval(column.join('.'))
+  end
+  
+  class <<self
+  
+    def first_of_the_month(now=Time.now.utc.to_date)
+      Date.new(now.year, now.month, 1).to_time(:utc)
+    end
+  
+    def last_monday(now=Time.now.utc.to_date)
+      wday = now.wday
+      if wday == 0
+        -6
+      else
+        diff = 1 - wday
+      end
+      Date.new(now.year, now.month, now.day + diff).to_time(:utc)
+    end
+  
+    def today(now=Time.now.utc.to_date)
+      Date.new(now.year, now.month, now.day).to_time(:utc)
+    end
   end
 end

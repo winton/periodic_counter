@@ -13,8 +13,8 @@ describe PeriodicCounter do
     start
     attributes = Counter.last.attributes
     data = attributes.delete('counter_data')
-    data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
-    data.delete('counter_last_2_days_at').to_s.should == Time.now.utc.to_s
+    data.delete('counter_last_day_at').to_s.should == PeriodicCounter.today.to_s
+    data.delete('counter_last_2_days_at').to_s.should == PeriodicCounter.today.to_s
     data.should == {
       "counter_last_day"=>1,
       "counter_last_2_days"=>1
@@ -32,8 +32,8 @@ describe PeriodicCounter do
     start
     attributes = Counter.last.attributes
     data = attributes.delete('counter_data')
-    data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
-    data.delete('counter_last_2_days_at').to_s.should == Time.now.utc.to_s
+    data.delete('counter_last_day_at').to_s.should == PeriodicCounter.today.to_s
+    data.delete('counter_last_2_days_at').to_s.should == PeriodicCounter.today.to_s
     data.should == {
       "counter_last_day"=>1,
       "counter_last_2_days"=>1
@@ -52,8 +52,8 @@ describe PeriodicCounter do
     start
     attributes = Counter.last.attributes
     data = attributes.delete('counter_data')
-    data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
-    data.delete('counter_last_2_days_at').to_s.should == (Time.now - 1.day).utc.to_s
+    data.delete('counter_last_day_at').to_s.should == PeriodicCounter.today.to_s
+    data.delete('counter_last_2_days_at').to_s.should == (PeriodicCounter.today - 1.day).to_s
     data.should == {
       "counter_last_day"=>3,
       "counter_last_2_days"=>1
@@ -72,8 +72,8 @@ describe PeriodicCounter do
     start
     attributes = Counter.last.attributes
     data = attributes.delete('counter_data')
-    data.delete('counter_last_day_at').to_s.should == Time.now.utc.to_s
-    data.delete('counter_last_2_days_at').to_s.should == Time.now.utc.to_s
+    data.delete('counter_last_day_at').to_s.should == PeriodicCounter.today.to_s
+    data.delete('counter_last_2_days_at').to_s.should == PeriodicCounter.today.to_s
     data.should == {
       "counter_last_day"=>4,
       "counter_last_2_days"=>4
