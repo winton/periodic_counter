@@ -3,6 +3,8 @@ Require.lib!
 
 class PeriodicCounter
   
+  WEEKDAYS = %w(sunday monday tuesday wednesday thursday friday saturday)
+  
   def initialize(environment, root)
     @db, @log, @mail = ActiveWrapper.setup(
       :base => root,
@@ -29,8 +31,7 @@ class PeriodicCounter
             # Find period columns
             period = columns.select do |col|
               col =~ /^#{column}/ &&
-              col != column &&
-              !col.include?('_data')
+              col =~ /_last_/
             end
             # Grab all records
             select_columns = [ 'id', column, "#{column}_data" ]
@@ -45,25 +46,34 @@ class PeriodicCounter
               count = record.delete(column).to_i
               # Set period counters
               period.each do |col|
-                computed_at = data["#{col}_at"] || Time.now.utc
-                duration = column_to_period_integer(col)
-                time_since_compute = Time.now.utc - computed_at
-                last_day =
-                  if col.include?('day')
-                    self.class.today
-                  elsif col.include?('week')
-                    self.class.last_monday
-                  elsif col.include?('month')
-                    self.class.first_of_the_month
+                if WEEKDAYS.include?(weekday = col.split('_last_')[1])
+                  data["#{col}_before_today"] ||= 0
+                  if self.class.weekday(weekday)
+                    record[col] = count - data["#{col}_before_today"]
+                  else
+                    data["#{col}_before_today"] = count
                   end
-                if (time_since_compute - duration) >= 0
-                  data[col] = count
-                  data["#{col}_at"] = last_day
                 else
-                  data[col] ||= count
-                  data["#{col}_at"] ||= last_day
+                  computed_at = data["#{col}_at"] || Time.now.utc
+                  duration = column_to_period_integer(col)
+                  time_since_compute = Time.now.utc - computed_at
+                  last_day =
+                    if col.include?('day')
+                      self.class.today
+                    elsif col.include?('week')
+                      self.class.last_monday
+                    elsif col.include?('month')
+                      self.class.first_of_the_month
+                    end
+                  if (time_since_compute - duration) >= 0
+                    data[col] = count
+                    data["#{col}_at"] = last_day
+                  else
+                    data[col] ||= count
+                    data["#{col}_at"] ||= last_day
+                  end
+                  record[col] = count - data[col].to_i
                 end
-                record[col] = count - data[col].to_i
               end
               # Update record
               record["#{column}_data"] = "'#{YAML::dump(data)}'"
@@ -107,6 +117,10 @@ class PeriodicCounter
   
     def today(now=Time.now.utc.to_date)
       Date.new(now.year, now.month, now.day).to_time(:utc)
+    end
+    
+    def weekday(day)
+      Time.now.utc.to_date.wday == WEEKDAYS.index(day)
     end
   end
 end

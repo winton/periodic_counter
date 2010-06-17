@@ -13,13 +13,17 @@ sudo gem install periodic_counter
 Create columns
 --------------
 
-You should already have a counter column defined that is being incremented by something (let's call the column X).
+You should already have a counter column (let's call it X) that is being incremented by some external process.
 
-Define period columns using this format: <code>X\_last\_week</code> or <code>X\_last\_6\_hours</code>.
+Add an <code>X_data</code> varchar column with a length of 2048.
 
-The period name should follow the format of [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html).
+Add your periodic counters (all integers):
 
-Also add an <code>X_data</code> varchar column with a length of 2048.
+* <code>X\_last\_week</code>
+* <code>X\_last\_6\_hours</code>
+* <code>X\_last_sunday</code>
+
+Currently only days of the week and [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html) are supported for text after <code>X_last</code>. If no digit is present, "1" is assumed.
 
 Create configuration
 --------------------
