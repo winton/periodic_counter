@@ -2,6 +2,8 @@ class Counters < ActiveRecord::Migration
   def self.up
     create_table :counters do |t|
       t.integer :counter
+      t.integer :counter_1_day_ago
+      t.integer :counter_2_days_ago
       t.integer :counter_last_day
       t.integer :counter_last_2_days
       t.integer :counter_last_monday

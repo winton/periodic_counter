@@ -31,7 +31,7 @@ class PeriodicCounter
             # Find period columns
             period = columns.select do |col|
               col =~ /^#{column}/ &&
-              col =~ /_last_/
+              (col =~ /_last_/ || col =~ /_ago$/)
             end
             # Grab all records
             select_columns = [ 'id', column, "#{column}_data" ]
@@ -54,25 +54,41 @@ class PeriodicCounter
                     data["#{col}_before_today"] = count
                   end
                 else
-                  computed_at = data["#{col}_at"] || Time.now.utc
-                  duration = column_to_period_integer(col)
-                  time_since_compute = Time.now.utc - computed_at
-                  last_day =
-                    if col.include?('day')
+                  computed_at = data["#{col}_at"]
+                  last_time =
+                    if col.include?('minute')
+                      self.class.this_minute
+                    elsif col.include?('hour')
+                      self.class.this_hour
+                    elsif col.include?('day')
                       self.class.today
                     elsif col.include?('week')
                       self.class.last_monday
                     elsif col.include?('month')
                       self.class.first_of_the_month
                     end
-                  if (time_since_compute - duration) >= 0
-                    data[col] = count
-                    data["#{col}_at"] = last_day
+                  if col =~ /_ago$/
+                    duration = column_to_period_integer(col, -3, -2)
+                    if !computed_at || last_time == computed_at
+                      data[col] = count
+                      data["#{col}_at"] = last_time
+                    end
+                    if computed_at && (Time.now.utc - computed_at - duration) >= 0
+                      record[col] = data[col]
+                      data[col] = count
+                      data["#{col}_at"] = last_time
+                    end
                   else
-                    data[col] ||= count
-                    data["#{col}_at"] ||= last_day
+                    duration = column_to_period_integer(col, -2, -1)
+                    if !computed_at || (Time.now.utc - computed_at - duration) >= 0
+                      data[col] = count
+                      data["#{col}_at"] = last_time
+                    else
+                      data[col] ||= count
+                      data["#{col}_at"] ||= last_time
+                    end
+                    record[col] = count - data[col].to_i
                   end
-                  record[col] = count - data[col].to_i
                 end
               end
               # Update record
@@ -90,8 +106,8 @@ class PeriodicCounter
     end
   end
   
-  def column_to_period_integer(column)
-    column = column.split('_')[-2..-1]
+  def column_to_period_integer(column, from, to)
+    column = column.split('_')[from..to]
     column[0] = column[0].to_i
     if column[0] == 0
       column[0] = 1
@@ -113,6 +129,14 @@ class PeriodicCounter
         diff = 1 - wday
       end
       Date.new(now.year, now.month, now.day + diff).to_time(:utc)
+    end
+    
+    def this_hour(now=Time.now.utc)
+      now - (now.min * 60) - now.sec
+    end
+    
+    def this_minute(now=Time.now.utc)
+      now - now.sec
     end
   
     def today(now=Time.now.utc.to_date)

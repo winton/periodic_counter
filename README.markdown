@@ -21,9 +21,10 @@ Add your periodic counters (all integers):
 
 * <code>X\_last\_week</code>
 * <code>X\_last\_6\_hours</code>
-* <code>X\_last_sunday</code>
+* <code>X\_last\_sunday</code>
+* <code>X\_2\_days\_ago</code>
 
-Currently only days of the week and [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html) are supported for text after <code>X_last</code>. If no digit is present, "1" is assumed.
+Currently only days of the week and [ActiveSupport's time extensions](http://api.rubyonrails.org/classes/ActiveSupport/CoreExtensions/Numeric/Time.html) are supported for time periods. If no digit is present, "1" is assumed.
 
 Create configuration
 --------------------
